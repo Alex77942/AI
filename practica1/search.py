@@ -101,11 +101,6 @@ def depthFirstSearch(search_problem):
         structure.push([s])
         
     visited = []
-    # path = structure.pop()
-    # print(f"path0 {path}")
-    # structure.push(path + path)
-    # path = structure.pop()
-    # print(f"path1 {path}")
     while not structure.isEmpty():
         path = list(structure.pop())
         current_state =  path[-1][0]# INDEX THE CURRENT STATE
@@ -128,9 +123,26 @@ def depthFirstSearch(search_problem):
 
 def breadthFirstSearch(search_problem):
     """Search the shallowest nodes in the search tree first."""
-    "*** YOUR CODE HERE ***"
-    util.raiseNotDefined()
+    structure = util.Queue()
+    visited = []
+    for s in search_problem.getSuccessors(search_problem.getStartState()):
+        structure.push([s])
+    
+    while not structure.isEmpty():
+        path = list(structure.pop())
+        current_state = path[-1][0]
+        
+        if search_problem.isGoalState(current_state):
+            return [s[1] for s in path]
 
+        if current_state not in visited:
+            visited += [current_state]
+            for succesor in search_problem.getSuccessors(current_state):
+                if succesor[0] not in visited:
+                    new_path = path + [succesor]
+                    structure.push(new_path)
+    
+    return None
 
 def uniformCostSearch(search_problem):
     """Search the node of least total cost first."""
