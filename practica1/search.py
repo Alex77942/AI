@@ -147,7 +147,7 @@ def breadthFirstSearch(search_problem):
             return [s[1] for s in path]  # RETURN THE PATH OF STATES
         if current_state not in visited:
             visited.append(current_state)
-            print(current_state)
+
             for successor in search_problem.getSuccessors(current_state):
                 if successor[0] not in visited:
                     new_path =  path + [successor]# CREATE THE NEW PATH OF STATES
