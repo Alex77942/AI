@@ -29,7 +29,7 @@ that say
 "*** YOUR CODE HERE ***"
 
 Name student 1: JIABO ZHAN
-Name student 2: 
+Name student 2: RUBÉN BUCERO GONZÁLEZ
 IA lab group and pair: 1312 - 08
 
 
