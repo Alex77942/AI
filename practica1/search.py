@@ -94,20 +94,24 @@ def depthFirstSearch(search_problem):
     print("Is the start a goal?", search_problem.isGoalState(search_problem.getStartState()))
     print("Start's successors:", search_problem.getSuccessors(search_problem.getStartState()))
     """
+    
+    if search_problem.isGoalState(search_problem.getStartState()):
+        return []
+    
     structure = util.Stack()
-
-    # structure.push([d[1] for d in search_problem.getSuccessors(search_problem.getStartState())]) # DEFINE THE INITIAL STATE
+    
     for s in search_problem.getSuccessors(search_problem.getStartState()):
         structure.push([s])
         
-    visited = []
+    
+    visited = [search_problem.getStartState()]
+    
     while not structure.isEmpty():
         path = list(structure.pop())
         current_state =  path[-1][0]# INDEX THE CURRENT STATE
-        print(f"path: {path} \ncurrent: {current_state}\n\n----------------------------")
+
         if search_problem.isGoalState(current_state):
             s = [s[1] for s in path] # RETURN THE PATH OF STATES
-            print(f"goalState{s}")
             return s # RETURN THE PATH OF STATES
 
 
@@ -123,25 +127,32 @@ def depthFirstSearch(search_problem):
 
 def breadthFirstSearch(search_problem):
     """Search the shallowest nodes in the search tree first."""
+    
+        
+    if search_problem.isGoalState(search_problem.getStartState()):
+        return []
+    
     structure = util.Queue()
-    visited = []
+
     for s in search_problem.getSuccessors(search_problem.getStartState()):
         structure.push([s])
+        
+    visited = [search_problem.getStartState()]
     
     while not structure.isEmpty():
         path = list(structure.pop())
-        current_state = path[-1][0]
+        current_state =  path[-1][0]# INDEX THE CURRENT STATE
         
         if search_problem.isGoalState(current_state):
-            return [s[1] for s in path]
-
+            return [s[1] for s in path]  # RETURN THE PATH OF STATES
         if current_state not in visited:
-            visited += [current_state]
-            for succesor in search_problem.getSuccessors(current_state):
-                if succesor[0] not in visited:
-                    new_path = path + [succesor]
+            visited.append(current_state)
+            print(current_state)
+            for successor in search_problem.getSuccessors(current_state):
+                if successor[0] not in visited:
+                    new_path =  path + [successor]# CREATE THE NEW PATH OF STATES
                     structure.push(new_path)
-    
+
     return None
 
 def uniformCostSearch(search_problem):
