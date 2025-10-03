@@ -456,23 +456,27 @@ def cornersHeuristic(cur_state, problem):
     shortest path from the state to a goal of the problem; i.e.  it should be
     admissible (as well as consistent).
     """
-    from util import manhattanDistance
     
-    current_position, corners_status = cur_state
+    cur_position, visited_corners = cur_state
     corners = problem.corners  # These are the corner coordinates
     walls = problem.walls  # These are the walls of the maze, as a Grid (game.py)
-        
-    unvisited = [corner for idx, corner in enumerate(corners) if not corners_status[idx]]
+    
+    unvisited = []
+    for i in range(len(corners)):
+        if not visited_corners[i]:
+            unvisited.append(corners[i])
     
     if not unvisited:
         return 0
-    
-    d_start = min(manhattanDistance(current_position,corner) for corner in unvisited)
-    d_fin = 0
+
+    min_dist = min(util.manhattanDistance(cur_position, corner) for corner in unvisited)
+
+    max_dist = 0
     for i in range(len(unvisited)):
-        for j in range(i+1,len(unvisited)):
-            d_fin = max(d_fin, manhattanDistance(unvisited[i],unvisited[j]))
-    return d_start + d_fin
+        for j in range(i+1, len(unvisited)):
+            max_dist = max(max_dist, util.manhattanDistance(unvisited[i], unvisited[j]))
+    
+    return min_dist + max_dist
 
 
 
