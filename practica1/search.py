@@ -172,38 +172,6 @@ def uniformCostSearch(search_problem):
                 structure.push((succesor,actions+[action],totalCost),totalCost)
     return None
 
-# def uniformCostSearch(search_problem):
-#     """Search the node of least total cost first."""
-
-#     if search_problem.isGoalState(search_problem.getStartState()):
-#         return []
-
-#     structure = util.PriorityQueue()
-    
-#     for s in search_problem.getSuccessors(search_problem.getStartState()):
-#         print(s)
-#         structure.push([s], s[2])
-    
-#     visited = [search_problem.getStartState()]
-    
-#     while not structure.isEmpty():
-#         path = list(structure.pop())
-#         current_state = path[-1][0]
-        
-#         if search_problem.isGoalState(current_state):
-#             return [s[1] for s in path]
-
-#         if current_state not in visited:
-#             visited += [current_state]
-#             for succesor in search_problem.getSuccessors(current_state):
-#                 if succesor[0] not in visited:
-#                     new_path = path + [succesor]
-#                     total_cost = sum(step[2] for step in new_path)
-#                     structure.push(new_path, total_cost)
-    
-#     return None
-
-
 def nullHeuristic(state, search_problem=None):
     """
     A heuristic function estimates the cost from the current state to the nearest
