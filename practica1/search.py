@@ -95,95 +95,113 @@ def depthFirstSearch(search_problem):
     print("Start's successors:", search_problem.getSuccessors(search_problem.getStartState()))
     """
     
-    if search_problem.isGoalState(search_problem.getStartState()):
-        return []
-    
+    start_state = search_problem.getStartState()
     structure = util.Stack()
+    visited = set()
     
-    for s in search_problem.getSuccessors(search_problem.getStartState()):
-        structure.push([s])
-        
-    
-    visited = [search_problem.getStartState()]
+    structure.push((start_state,[]))
     
     while not structure.isEmpty():
-        path = list(structure.pop())
-        current_state =  path[-1][0]# INDEX THE CURRENT STATE
-
+        
+        current_state, actions = structure.pop()
+        if current_state in visited:
+            continue
+        
+        
         if search_problem.isGoalState(current_state):
-            s = [s[1] for s in path] # RETURN THE PATH OF STATES
-            return s # RETURN THE PATH OF STATES
-
-
-        if current_state not in visited:
-            visited.append(current_state)
-            for successor in search_problem.getSuccessors(current_state):
-                if successor[0] not in visited:
-                    new_path =  path + [successor]# CREATE THE NEW PATH OF STATES
-                    structure.push(new_path)
-
+            return actions
+        
+        visited.add(current_state)
+        
+        for succesor, action,_ in search_problem.getSuccessors(current_state):
+            if succesor not in visited:
+                structure.push((succesor,actions+[action]))
     return None
-
 
 def breadthFirstSearch(search_problem):
     """Search the shallowest nodes in the search tree first."""
     
-        
-    if search_problem.isGoalState(search_problem.getStartState()):
-        return []
-    
+    start_state = search_problem.getStartState()
     structure = util.Queue()
-
-    for s in search_problem.getSuccessors(search_problem.getStartState()):
-        structure.push([s])
-        
-    visited = [search_problem.getStartState()]
+    visited = set()
+    
+    structure.push((start_state,[]))
     
     while not structure.isEmpty():
-        path = list(structure.pop())
-        current_state =  path[-1][0]# INDEX THE CURRENT STATE
+        
+        current_state, actions = structure.pop()
+        if current_state in visited:
+            continue
+        
         
         if search_problem.isGoalState(current_state):
-            return [s[1] for s in path]  # RETURN THE PATH OF STATES
-        if current_state not in visited:
-            visited.append(current_state)
-
-            for successor in search_problem.getSuccessors(current_state):
-                if successor[0] not in visited:
-                    new_path =  path + [successor]# CREATE THE NEW PATH OF STATES
-                    structure.push(new_path)
-
+            return actions
+        
+        visited.add(current_state)
+        
+        for succesor, action,_ in search_problem.getSuccessors(current_state):
+            if succesor not in visited:
+                structure.push((succesor,actions+[action]))
     return None
+
 
 def uniformCostSearch(search_problem):
-    """Search the node of least total cost first."""
-
-    if search_problem.isGoalState(search_problem.getStartState()):
-        return []
-
+    """Search the shallowest nodes in the search tree first."""
+    
+    start_state = search_problem.getStartState()
     structure = util.PriorityQueue()
+    visited = set()
     
-    for s in search_problem.getSuccessors(search_problem.getStartState()):
-        structure.push([s], s[2])
-    
-    visited = [search_problem.getStartState()]
+    structure.push((start_state,[],0),0)
     
     while not structure.isEmpty():
-        path = list(structure.pop())
-        current_state = path[-1][0]
+        
+        current_state, actions,costs = structure.pop()
+        if current_state in visited:
+            continue
+        
         
         if search_problem.isGoalState(current_state):
-            return [s[1] for s in path]
-
-        if current_state not in visited:
-            visited += [current_state]
-            for succesor in search_problem.getSuccessors(current_state):
-                if succesor[0] not in visited:
-                    new_path = path + [succesor]
-                    total_cost = sum(step[2] for step in new_path)
-                    structure.push(new_path, total_cost)
-    
+            return actions
+        
+        visited.add(current_state)
+        
+        for succesor, action,cost in search_problem.getSuccessors(current_state):
+            if succesor not in visited:
+                totalCost = costs+cost
+                structure.push((succesor,actions+[action],totalCost),totalCost)
     return None
+
+# def uniformCostSearch(search_problem):
+#     """Search the node of least total cost first."""
+
+#     if search_problem.isGoalState(search_problem.getStartState()):
+#         return []
+
+#     structure = util.PriorityQueue()
+    
+#     for s in search_problem.getSuccessors(search_problem.getStartState()):
+#         print(s)
+#         structure.push([s], s[2])
+    
+#     visited = [search_problem.getStartState()]
+    
+#     while not structure.isEmpty():
+#         path = list(structure.pop())
+#         current_state = path[-1][0]
+        
+#         if search_problem.isGoalState(current_state):
+#             return [s[1] for s in path]
+
+#         if current_state not in visited:
+#             visited += [current_state]
+#             for succesor in search_problem.getSuccessors(current_state):
+#                 if succesor[0] not in visited:
+#                     new_path = path + [succesor]
+#                     total_cost = sum(step[2] for step in new_path)
+#                     structure.push(new_path, total_cost)
+    
+#     return None
 
 
 def nullHeuristic(state, search_problem=None):
@@ -196,32 +214,30 @@ def nullHeuristic(state, search_problem=None):
 
 def aStarSearch(search_problem, heuristic=nullHeuristic):
     """Search the node that has the lowest combined cost and heuristic first."""
-    if search_problem.isGoalState(search_problem.getStartState()):
-        return []
 
+    start_state = search_problem.getStartState()
     structure = util.PriorityQueue()
     
-    for s in search_problem.getSuccessors(search_problem.getStartState()):
-        cost = s[2] + heuristic(s[0], search_problem)
-        structure.push([s], cost)
-    
-    visited = [search_problem.getStartState()]
+    visited = set()
+
+    structure.push((start_state,[],0),heuristic(start_state, search_problem))
     
     while not structure.isEmpty():
-        path = list(structure.pop())
-        current_state = path[-1][0]
+        current_state, actions, costs = structure.pop()
+        
+        if current_state in visited:
+            continue
         
         if search_problem.isGoalState(current_state):
-            return [s[1] for s in path]
-
-        if current_state not in visited:
-            visited += [current_state]
-            for succesor in search_problem.getSuccessors(current_state):
-                if succesor[0] not in visited:
-                    new_path = path + [succesor]
-                    total_cost = sum(step[2] for step in new_path)
-                    total_cost += heuristic(succesor[0], search_problem)
-                    structure.push(new_path, total_cost)
+            return actions
+        
+        visited.add(current_state)
+        
+        for successor,action,cost in search_problem.getSuccessors(current_state):
+            if successor not in visited:
+                total_cost = costs + cost
+                priority = total_cost  + heuristic(successor, search_problem)
+                structure.push((successor,actions+[action], total_cost),priority)
     
     return None
 
