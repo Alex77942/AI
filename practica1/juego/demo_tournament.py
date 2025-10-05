@@ -56,15 +56,14 @@ def getBorders(state: TwoPlayerGameState, n = 8):
 
     return -res
 
-def getNCorners(state: TwoPlayerGameState,corner = 8):
+def getNCorners(state: TwoPlayerGameState, corner = 8):
     s = {(1,1),(1,corner),(corner,1),(corner,corner)}
     d = {state.player1.label: 0, state.player2.label: 0}
     
-    for  x in s:
+    for x in s:
         c = state.board.get(x)
         if c is not None:
             d[c]+=1
-    
                 
     res = d[state.player1.label] - d[state.player2.label]
     
@@ -72,8 +71,29 @@ def getNCorners(state: TwoPlayerGameState,corner = 8):
         return res
 
     return -res
+
 def moves(state:TwoPlayerGameState):
     return len(state.game.generate_successors(state))
+
+def getStability(state: TwoPlayerGameState, corner = 8):
+        d = {state.player1.label: 0, state.player2.label: 0}
+        s = {(1,1),(1,corner),(corner,1),(corner,corner)}
+        
+        for x in s:
+            c = state.board.get(x)
+            if c is not None:
+                for dx,dy in {(0,1),(1,0),(1,1)}:
+                    nx, ny = x[0]+dx, x[1]+dy
+                    if (nx,ny) in state.board and state.board[(nx,ny)] == c:
+                        d[c] += 1
+
+        res = d[state.player1.label] - d[state.player2.label]
+
+        if state.is_player_max(state.player1):
+            return res
+        else:
+            return -res
+
 class Heuristic1(StudentHeuristic):
 
     def get_name(self) -> str:
@@ -100,11 +120,20 @@ class Heuristic2(StudentHeuristic):
 class Heuristic3(StudentHeuristic):
 
     def get_name(self) -> str:
-        return "heuristic"
+        return "heuristic1"
 
     def evaluation_function(self, state: TwoPlayerGameState) -> float:
         
         return 64 * getNCorners(state) + 16 * moves(state) + 4 * getBorders(state) + score(state)
+    
+class Heuristic4(StudentHeuristic):
+
+    def get_name(self) -> str:
+        return "heuristic2"
+
+    def evaluation_function(self, state: TwoPlayerGameState) -> float: 
+
+        return 64 * getNCorners(state) + 10 * getStability(state) + 4 * getBorders(state) + 16 * moves(state) + score(state)
 
 
 def create_reversi_match(player1: Player, player2: Player) -> TwoPlayerMatch:
@@ -177,12 +206,12 @@ create_match = create_reversi_match
 tour = Tournament(max_depth=3, init_match=create_match, max_evaluation_time=0.5)
 
 # if the strategies are copy-pasted here:
-strats = {'opt1': [Heuristic1], 'opt2': [Heuristic2], 'opt3': [Heuristic3]}
+strats = {'opt1': [Heuristic1], 'opt2': [Heuristic2], 'opt3': [Heuristic3], 'opt4': [Heuristic4]}
 # if the strategies should be loaded from files in a specific folder:
 # folder_name = "folder_strat" # name of the folder where the strategy files are located
 # strats = tour.load_strategies_from_folder(folder=folder_name, max_strat=3)
 
-n = 1
+n = 10
 scores, totals, names = tour.run(
     student_strategies=strats,
     increasing_depth=False,

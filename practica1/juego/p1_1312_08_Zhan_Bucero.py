@@ -69,6 +69,25 @@ def getNCorners(state: TwoPlayerGameState,corner = 8):
 def moves(state:TwoPlayerGameState):
     return len(state.game.generate_successors(state))
 
+def getStability(state: TwoPlayerGameState, corner = 8):
+        d = {state.player1.label: 0, state.player2.label: 0}
+        s = {(1,1),(1,corner),(corner,1),(corner,corner)}
+        
+        for x in s:
+            c = state.board.get(x)
+            if c is not None:
+                for dx,dy in {(0,1),(1,0),(1,1)}:
+                    nx, ny = x[0]+dx, x[1]+dy
+                    if (nx,ny) in state.board and state.board[(nx,ny)] == c:
+                        d[c] += 1
+
+        res = d[state.player1.label] - d[state.player2.label]
+
+        if state.is_player_max(state.player1):
+            return res
+        else:
+            return -res
+        
 class MySolution1(StudentHeuristic):
     def get_name(self) -> str:
         return "mysolution1"
@@ -78,10 +97,10 @@ class MySolution1(StudentHeuristic):
         return 64 * getNCorners(state) + 16 * moves(state) + 4 * getBorders(state) + score(state)
 
 
-# class Solution2(StudentHeuristic):
-#     def get_name(self) -> str:
-#         return "solution2"
+class MySolution2(StudentHeuristic):
+    def get_name(self) -> str:
+        return "mysolution2"
 
-#     def evaluation_function(self, state: TwoPlayerGameState) -> float:
-#         # let's use a global function
-#         return func_glob(2, state)
+    def evaluation_function(self, state: TwoPlayerGameState) -> float: 
+
+        return 64 * getNCorners(state) + 10 * getStability(state) + 4 * getBorders(state) + 16 * moves(state) + score(state)
