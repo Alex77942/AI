@@ -54,30 +54,45 @@ def score(state):
 def getBorders(state: TwoPlayerGameState, n = 8):
     s = set()
     for col in range(1,n+1):
-        s.add(col,n)
-        s.add(n,col)
+        s.add((col,n))
+        s.add((n,col))
+        
     for row in range(1,n+1):
-        s.add(row,1)
-        s.add(row,n)
-    d = {'B': 0, 'W': 0}
+        s.add((row,1))
+        s.add((row,n))
+        
+    d = {state.player1.label: 0, state.player2.label: 0}
     
     for pos, value in state.board.items():
         if pos in s:
             if value in d:
                 d[value]+=1
+                
+    res = d[state.player1.label] - d[state.player2.label]
     
-    return d
+    if state.is_player_max(state.player1):
+        return res
+
+    return -res
 
 def getNCorners(state: TwoPlayerGameState,corner = 8):
     s = {(1,1),(1,corner),(corner,1),(corner,corner)}
-    d = {'B': 0, 'W': 0}
+    d = {state.player1.label: 0, state.player2.label: 0}
+    
     for  x in s:
         c = state.board.get(x)
         if c is not None:
             d[c]+=1
-            
-    return d
+    
+                
+    res = d[state.player1.label] - d[state.player2.label]
+    
+    if state.is_player_max(state.player1):
+        return res
 
+    return -res
+def moves(state:TwoPlayerGameState):
+    return len(state.game.generate_successors(state))
 class Heuristic1(StudentHeuristic):
 
     def get_name(self) -> str:
@@ -108,8 +123,7 @@ class Heuristic3(StudentHeuristic):
 
     def evaluation_function(self, state: TwoPlayerGameState) -> float:
         
-        getNCorners(state)
-        return 0
+        return 64 * getNCorners(state) + 16 * moves(state) + 4 * getBorders(state) + score(state)
 
 
 def create_reversi_match(player1: Player, player2: Player) -> TwoPlayerMatch:
