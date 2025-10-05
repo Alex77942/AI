@@ -18,25 +18,6 @@ from reversi import (
 )
 from tournament import StudentHeuristic, Tournament
 
-def simple_evaluation_function(state: TwoPlayerGameState) -> float:
-    """Return a random value, except for terminal game states."""
-    state_value = 2*np.random.rand() - 1
-
-    if state.end_of_game:
-        scores = state.scores
-        # Evaluation of the state from the point of view of MAX
-
-        assert isinstance(scores, (Sequence, np.ndarray))
-        score_difference = scores[0] - scores[1]
-
-        if state.is_player_max(state.player1):
-            state_value = score_difference
-        elif state.is_player_max(state.player2):
-            state_value = - score_difference
-        else:
-            raise ValueError('Player MAX not defined')
-
-    return state_value
 
 def score(state):
     scores = state.scores
