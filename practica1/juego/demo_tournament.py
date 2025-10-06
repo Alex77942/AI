@@ -21,8 +21,6 @@ from tournament import StudentHeuristic, Tournament
 
 def score(state):
     scores = state.scores
-        # Evaluation of the state from the point of view of MAX
-
     score_difference = scores[0] - scores[1]
 
     if state.is_player_max(state.player1):
