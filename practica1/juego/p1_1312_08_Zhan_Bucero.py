@@ -64,8 +64,6 @@ def getNCorners(state: TwoPlayerGameState, n = 8):
 
     return -res
 
-def moves(state:TwoPlayerGameState):
-    return len(state.game.generate_successors(state))
 
 def getStability(state: TwoPlayerGameState, n = 8):
     d = {state.player1.label: 0, state.player2.label: 0}
@@ -108,7 +106,7 @@ class PositionalHeuristic(StudentHeuristic):
 
     def evaluation_function(self, state: TwoPlayerGameState) -> float:
         
-        return 64 * getNCorners(state) + 16 * moves(state) + 4 * getBorders(state) + score(state)
+        return 64 * getNCorners(state)  + 4 * getBorders(state) + score(state)
 
 
 class StabilityHeuristic(StudentHeuristic):
@@ -117,7 +115,7 @@ class StabilityHeuristic(StudentHeuristic):
 
     def evaluation_function(self, state: TwoPlayerGameState) -> float: 
 
-        return 64 * getNCorners(state) + 10 * getStability(state) + 4 * getBorders(state) + 16 * moves(state) + score(state)
+        return 64 * getNCorners(state) + 10 * getStability(state) + 4 * getBorders(state)  + score(state)
 
 class ParityHeuristic(StudentHeuristic):
 
@@ -126,3 +124,4 @@ class ParityHeuristic(StudentHeuristic):
 
     def evaluation_function(self, state: TwoPlayerGameState) -> float:
         return getParity(state)
+
