@@ -104,27 +104,27 @@ def getParity(state: TwoPlayerGameState, n = 8):
     else:
         return -res  
   
-class MySolution1(StudentHeuristic):
+class PositionalHeuristic(StudentHeuristic):
     def get_name(self) -> str:
-        return "mysolution1"
+        return "positional"
 
     def evaluation_function(self, state: TwoPlayerGameState) -> float:
         
         return 64 * getNCorners(state) + 16 * moves(state) + 4 * getBorders(state) + score(state)
 
 
-class MySolution2(StudentHeuristic):
+class StabilityHeuristic(StudentHeuristic):
     def get_name(self) -> str:
-        return "mysolution2"
+        return "stability"
 
     def evaluation_function(self, state: TwoPlayerGameState) -> float: 
 
         return 64 * getNCorners(state) + 10 * getStability(state) + 4 * getBorders(state) + 16 * moves(state) + score(state)
 
-class MySolution3(StudentHeuristic):
+class ParityHeuristic(StudentHeuristic):
 
     def get_name(self) -> str:
-        return "mysolution3"
+        return "parity"
 
     def evaluation_function(self, state: TwoPlayerGameState) -> float:
         return getParity(state)
