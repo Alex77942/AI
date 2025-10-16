@@ -91,7 +91,7 @@ def getStability(state: TwoPlayerGameState, n = 8):
         return -res
 
 def getParity(state: TwoPlayerGameState, n = 8):
-    disks = len([pos for pos, value in state.board.items() if value is not None])
+    disks = len(state.board)
     progress = disks / (n * n)
         
     scores = state.scores
@@ -154,7 +154,9 @@ class Heuristic5(StudentHeuristic):
         return "heuristic3"
 
     def evaluation_function(self, state: TwoPlayerGameState) -> float:
-        return getParity(state)
+        if len(state.board) < 54:
+            return 64 * getNCorners(state) + 10 * getStability(state) + 4 * getBorders(state) + score(state)
+        return 10*getParity(state) + 64 * getNCorners(state) + 10 * getStability(state) + 4 * getBorders(state) + score(state)
 
 def create_reversi_match(player1: Player, player2: Player) -> TwoPlayerMatch:
 
@@ -231,7 +233,7 @@ strats = {'opt1': [Heuristic1], 'opt2': [Heuristic2], 'opt3': [Heuristic3], 'opt
 # folder_name = "folder_strat" # name of the folder where the strategy files are located
 # strats = tour.load_strategies_from_folder(folder=folder_name, max_strat=3)
 
-n = 5
+n = 10
 scores, totals, names = tour.run(
     student_strategies=strats,
     increasing_depth=False,
@@ -259,4 +261,3 @@ for name1 in names:
         else:
             print('\t%d' % (scores[name1][name2]), end='')
     print()
-
