@@ -18,6 +18,56 @@ from reversi import (
 )
 from tournament import StudentHeuristic, Tournament
 
+def getMobility(state: TwoPlayerGameState):
+    d = {state.player1.label: 0, state.player2.label: 0}
+    for player in [state.player1, state.player2]:
+        moves = state.game.generate_successors(state)
+        d[player.label] = len(moves)
+    
+    res = d[state.player1.label] - d[state.player2.label]
+    
+    if state.is_player_max(state.player1):
+        return res
+    else:
+        return -res
+    
+def getPotentialMobility(state: TwoPlayerGameState):
+    current = state.next_player
+    opponent = state.game.opponent(current)
+
+    opp_cells = [pos for pos, v in state.board.items() if v == opponent.label]
+    potential = 0
+
+    for (x, y) in opp_cells:
+        for dx, dy in [(-1,0),(1,0),(0,-1),(0,1),(-1,-1),(1,1),(-1,1),(1,-1)]:
+            nx, ny = x + dx, y + dy
+            if (nx, ny) not in state.board and 1 <= nx <= 8 and 1 <= ny <= 8:
+                potential += 1
+
+    if state.is_player_max(state.player1):
+        return potential
+    else:
+        return -potential
+
+
+
+class DynamicHeuristic(StudentHeuristic):
+    def get_name(self) -> str:
+        return "dynamic_Zhan_Bucero"
+
+    def evaluation_function(self, state: TwoPlayerGameState) -> float:
+        empty = 64 - len(state.board)
+        
+        if empty > 40:
+            w_c, w_s, w_m, w_b = 25, 5, 10, 2
+        elif empty > 15:
+            w_c, w_s, w_m, w_b = 40, 10, 6, 4
+        else:
+            w_c, w_s, w_m, w_b = 64, 20, 2, 4
+
+        return (w_c * getNCorners(state) + w_s * getStability(state) + w_m * getMobility(state) + w_b * getBorders(state) + score(state) + 2 * getPotentialMobility(state))
+
+
 
 def score(state):
     scores = state.scores
@@ -228,12 +278,12 @@ create_match = create_reversi_match
 tour = Tournament(max_depth=3, init_match=create_match, max_evaluation_time=0.5)
 
 # if the strategies are copy-pasted here:
-strats = {'opt1': [Heuristic1], 'opt2': [Heuristic2], 'opt3': [Heuristic3], 'opt4': [Heuristic4], 'opt5': [Heuristic5]}
+strats = {'opt1': [Heuristic1], 'opt2': [Heuristic2], 'opt3': [Heuristic3], 'opt4': [Heuristic4], 'lacabra': [DynamicHeuristic]}
 # if the strategies should be loaded from files in a specific folder:
 # folder_name = "folder_strat" # name of the folder where the strategy files are located
 # strats = tour.load_strategies_from_folder(folder=folder_name, max_strat=3)
 
-n = 10
+n = 5
 scores, totals, names = tour.run(
     student_strategies=strats,
     increasing_depth=False,
