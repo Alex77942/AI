@@ -18,57 +18,6 @@ from reversi import (
 )
 from tournament import StudentHeuristic, Tournament
 
-def getMobility(state: TwoPlayerGameState):
-    d = {state.player1.label: 0, state.player2.label: 0}
-    for player in [state.player1, state.player2]:
-        moves = state.game.generate_successors(state)
-        d[player.label] = len(moves)
-    
-    res = d[state.player1.label] - d[state.player2.label]
-    
-    if state.is_player_max(state.player1):
-        return res
-    else:
-        return -res
-    
-def getPotentialMobility(state: TwoPlayerGameState):
-    current = state.next_player
-    opponent = state.game.opponent(current)
-
-    opp_cells = [pos for pos, v in state.board.items() if v == opponent.label]
-    potential = 0
-
-    for (x, y) in opp_cells:
-        for dx, dy in [(-1,0),(1,0),(0,-1),(0,1),(-1,-1),(1,1),(-1,1),(1,-1)]:
-            nx, ny = x + dx, y + dy
-            if (nx, ny) not in state.board and 1 <= nx <= 8 and 1 <= ny <= 8:
-                potential += 1
-
-    if state.is_player_max(state.player1):
-        return potential
-    else:
-        return -potential
-
-
-
-class DynamicHeuristic(StudentHeuristic):
-    def get_name(self) -> str:
-        return "dynamic_Zhan_Bucero"
-
-    def evaluation_function(self, state: TwoPlayerGameState) -> float:
-        empty = 64 - len(state.board)
-        
-        if empty > 40:
-            w_c, w_s, w_m, w_b = 25, 5, 10, 2
-        elif empty > 15:
-            w_c, w_s, w_m, w_b = 40, 10, 6, 4
-        else:
-            w_c, w_s, w_m, w_b = 64, 20, 2, 4
-
-        return (w_c * getNCorners(state) + w_s * getStability(state) + w_m * getMobility(state) + w_b * getBorders(state) + score(state) + 2 * getPotentialMobility(state))
-
-
-
 def score(state):
     scores = state.scores
     score_difference = scores[0] - scores[1]
@@ -108,10 +57,11 @@ def getNCorners(state: TwoPlayerGameState, n = 8):
     s = {(1,1),(1,n),(n,1),(n,n)}
     d = {state.player1.label: 0, state.player2.label: 0}
     
-    for x in s:
+    for  x in s:
         c = state.board.get(x)
         if c is not None:
             d[c]+=1
+    
                 
     res = d[state.player1.label] - d[state.player2.label]
     
@@ -148,13 +98,57 @@ def getParity(state: TwoPlayerGameState, n = 8):
     disk_difference = scores[0] - scores[1]
         
     weight = 1.0 + (9.0 * progress)
-
+    
     res = weight * disk_difference
         
     if state.is_player_max(state.player1):
         return res
     else:
-        return -res  
+        return -res
+    
+class PositionalHeuristic(StudentHeuristic):
+    def get_name(self) -> str:
+        return "positional_Zhan_Bucero"
+
+    def evaluation_function(self, state: TwoPlayerGameState) -> float:
+        
+        return 64 * getNCorners(state)  + 4 * getBorders(state) + score(state)
+
+
+class StabilityHeuristic(StudentHeuristic):
+    def get_name(self) -> str:
+        return "stability_Zhan_Bucero"
+
+    def evaluation_function(self, state: TwoPlayerGameState) -> float: 
+
+        return 64 * getNCorners(state) + 10 * getStability(state) + 4 * getBorders(state)  + score(state)
+    
+class ParityHeuristic(StudentHeuristic):
+
+    def get_name(self) -> str:
+        return "parity_Zhan_Bucero"
+
+    def evaluation_function(self, state: TwoPlayerGameState) -> float:
+        return getParity(state)
+    
+class StabilityParityHeuristic(StudentHeuristic):
+
+    def get_name(self) -> str:
+        return "stability_parity_Zhan_Bucero"
+
+    def evaluation_function(self, state: TwoPlayerGameState) -> float:
+        if len(state.board) < 54:
+            return 64 * getNCorners(state) + 10 * getStability(state) + 4 * getBorders(state) + score(state)
+        return 10*getParity(state) + 64 * getNCorners(state) + 10 * getStability(state) + 4 * getBorders(state) + score(state)
+
+class StabilitySuccessorHeuristic(StudentHeuristic):
+
+    def get_name(self) -> str:
+        return "stability_successor_Zhan_Bucero"
+
+    def evaluation_function(self, state: TwoPlayerGameState) -> float:
+        return  64 * getNCorners(state) + 10 * getStability(state) + 4 * getBorders(state) + score(state) + 8*len(state.game.generate_successors(state))
+
   
 class Heuristic1(StudentHeuristic):
 
@@ -177,36 +171,6 @@ class Heuristic2(StudentHeuristic):
 
     def evaluation_function(self, state: TwoPlayerGameState) -> float:
         return float(np.random.rand())
-
-
-class Heuristic3(StudentHeuristic):
-
-    def get_name(self) -> str:
-        return "heuristic1"
-
-    def evaluation_function(self, state: TwoPlayerGameState) -> float:
-        
-        return 64 * getNCorners(state) + 4 * getBorders(state) + score(state)
-    
-class Heuristic4(StudentHeuristic):
-
-    def get_name(self) -> str:
-        return "heuristic2"
-
-    def evaluation_function(self, state: TwoPlayerGameState) -> float: 
-
-        return 64 * getNCorners(state) + 10 * getStability(state) + 4 * getBorders(state) + score(state)
-
-
-class Heuristic5(StudentHeuristic):
-
-    def get_name(self) -> str:
-        return "heuristic3"
-
-    def evaluation_function(self, state: TwoPlayerGameState) -> float:
-        if len(state.board) < 54:
-            return 64 * getNCorners(state) + 10 * getStability(state) + 4 * getBorders(state) + score(state)
-        return 10*getParity(state) + 64 * getNCorners(state) + 10 * getStability(state) + 4 * getBorders(state) + score(state)
 
 def create_reversi_match(player1: Player, player2: Player) -> TwoPlayerMatch:
 
@@ -278,7 +242,9 @@ create_match = create_reversi_match
 tour = Tournament(max_depth=3, init_match=create_match, max_evaluation_time=0.5)
 
 # if the strategies are copy-pasted here:
-strats = {'opt1': [Heuristic1], 'opt2': [Heuristic2], 'opt3': [Heuristic3], 'opt4': [Heuristic4], 'lacabra': [DynamicHeuristic]}
+strats = {'opt1': [Heuristic1], 'opt2': [Heuristic2], 'positional_Zhan_Bucero': [PositionalHeuristic],
+         'stability_Zhan_Bucero': [StabilityHeuristic], 'parity_Zhan_Bucero': [ParityHeuristic],
+         'stability_parity_Zhan_Bucero': [StabilityParityHeuristic], 'stability_successor_Zhan_Bucero': [StabilitySuccessorHeuristic]}
 # if the strategies should be loaded from files in a specific folder:
 # folder_name = "folder_strat" # name of the folder where the strategy files are located
 # strats = tour.load_strategies_from_folder(folder=folder_name, max_strat=3)

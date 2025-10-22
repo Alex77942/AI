@@ -84,6 +84,21 @@ def getStability(state: TwoPlayerGameState, n = 8):
     else:
         return -res
 
+def getParity(state: TwoPlayerGameState, n = 8):
+    disks = len(state.board)
+    progress = disks / (n * n)
+        
+    scores = state.scores
+    disk_difference = scores[0] - scores[1]
+        
+    weight = 1.0 + (9.0 * progress)
+    
+    res = weight * disk_difference
+        
+    if state.is_player_max(state.player1):
+        return res
+    else:
+        return -res
     
 class PositionalHeuristic(StudentHeuristic):
     def get_name(self) -> str:
@@ -101,6 +116,24 @@ class StabilityHeuristic(StudentHeuristic):
     def evaluation_function(self, state: TwoPlayerGameState) -> float: 
 
         return 64 * getNCorners(state) + 10 * getStability(state) + 4 * getBorders(state)  + score(state)
+    
+class ParityHeuristic(StudentHeuristic):
+
+    def get_name(self) -> str:
+        return "parity_Zhan_Bucero"
+
+    def evaluation_function(self, state: TwoPlayerGameState) -> float:
+        return getParity(state)
+    
+class StabilityParityHeuristic(StudentHeuristic):
+
+    def get_name(self) -> str:
+        return "stability_parity_Zhan_Bucero"
+
+    def evaluation_function(self, state: TwoPlayerGameState) -> float:
+        if len(state.board) < 54:
+            return 64 * getNCorners(state) + 10 * getStability(state) + 4 * getBorders(state) + score(state)
+        return 10*getParity(state) + 64 * getNCorners(state) + 10 * getStability(state) + 4 * getBorders(state) + score(state)
 
 class StabilitySuccessorHeuristic(StudentHeuristic):
 

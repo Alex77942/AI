@@ -295,6 +295,14 @@ class MinimaxAlphaBetaStrategy(Strategy):
         if self.verbose > 1:
             print('{}: {}'.format(state.board, minimax_value))
 
+        if self.verbose > 1:
+            print('{}: [{:.2g}, {:.2g}]'.format(
+                    state.board,
+                    alpha,
+                    beta,
+                )
+            )
+
         return minimax_value, minimax_successor
     
     def _min_value(
@@ -343,5 +351,13 @@ class MinimaxAlphaBetaStrategy(Strategy):
 
         if self.verbose > 1:
             print('{}: {}'.format(state.board, minimax_value))
+
+        if self.verbose > 1:
+            print('{}: [{:.2g}, {:.2g}]'.format(
+                    state.board,
+                    alpha,
+                    beta,
+                )
+            )
 
         return minimax_value, minimax_successor
